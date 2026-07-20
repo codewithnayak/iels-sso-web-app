@@ -5,7 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  NODE_VERSION: "21"
+  NODE_VERSION: "20"
   DOCKERHUB_USERNAME: "$(dockerhubUser)"
   DOCKERHUB_PASSWORD: "$(dockerhubPass)"
   IMAGE_NAME: "iels-sso-web-app"
