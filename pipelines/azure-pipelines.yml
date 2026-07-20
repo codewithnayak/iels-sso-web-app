@@ -6,7 +6,8 @@ pool:
 
 variables:
   NODE_VERSION: "20"
-  ACR_NAME: "ielsplatformcr.azurecr.io" # example: elsregistry
+  DOCKERHUB_USERNAME: "$(dockerhubUser)"
+  DOCKERHUB_PASSWORD: "$(dockerhubPass)"
   IMAGE_NAME: "iels-sso-web-app"
   IMAGE_TAG: "$(Build.BuildId)"
 
@@ -16,32 +17,25 @@ steps:
       versionSpec: "$(NODE_VERSION)"
     displayName: "Install Node.js"
 
-  - script: |
-      npm ci
+  - script: npm ci
     displayName: "Install dependencies"
 
-  - script: |
-      npm test
+  - script: npm test
     displayName: "Run tests"
 
-  - script: |
-      npm run build
+  - script: npm run build
     displayName: "Build React app"
 
   - task: DockerInstaller@0
     displayName: "Install Docker"
 
   - script: |
-      echo "Building Docker image..."
-      docker build -t $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(IMAGE_TAG) .
-    displayName: "Build Docker image"
+      echo "Logging into Docker Hub..."
+      echo "$(DOCKERHUB_PASSWORD)" | docker login -u "$(DOCKERHUB_USERNAME)" --password-stdin
 
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure-ELS-Connection"
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        az acr login --name $(ACR_NAME)
-        docker push $(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(IMAGE_TAG)
-    displayName: "Push image to ACR"
+      echo "Building Docker image..."
+      docker build -t $(DOCKERHUB_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG) .
+
+      echo "Pushing image..."
+      docker push $(DOCKERHUB_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)
+    displayName: "Build and push Docker image to Docker Hub"
