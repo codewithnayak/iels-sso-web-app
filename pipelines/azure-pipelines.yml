@@ -10,25 +10,41 @@ variables:
   DOCKERHUB_PASSWORD: "$(dockerhubPass)"
   IMAGE_NAME: "iels-sso-web-app"
   IMAGE_TAG: "$(Build.BuildId)"
+  GCP_KEY: "$(gcpKey)" # Secret JSON key for GKE access
+  GCP_PROJECT: "iels-org"
+  GKE_CLUSTER: "autopilot-cluster-1"
+  HELM_NAMESPACE: "iels-dev"
 
 steps:
+  # -----------------------------
+  # Install Node
+  # -----------------------------
   - task: NodeTool@0
     inputs:
       versionSpec: "$(NODE_VERSION)"
     displayName: "Install Node.js"
 
+  # -----------------------------
+  # Install dependencies
+  # -----------------------------
   - script: npm ci
     displayName: "Install dependencies"
 
-  # - script: npm test
-  #   displayName: "Run tests"
-
+  # -----------------------------
+  # Build React app
+  # -----------------------------
   - script: npm run build
     displayName: "Build React app"
 
+  # -----------------------------
+  # Install Docker
+  # -----------------------------
   - task: DockerInstaller@0
     displayName: "Install Docker"
 
+  # -----------------------------
+  # Build + Push Docker image
+  # -----------------------------
   - script: |
       echo "Logging into Docker Hub..."
       echo "$(DOCKERHUB_PASSWORD)" | docker login -u "$(DOCKERHUB_USERNAME)" --password-stdin
@@ -39,3 +55,44 @@ steps:
       echo "Pushing image..."
       docker push $(DOCKERHUB_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)
     displayName: "Build and push Docker image to Docker Hub"
+
+  # -----------------------------
+  # Install gcloud CLI
+  # -----------------------------
+  - script: |
+      echo "Installing Google Cloud SDK..."
+      sudo apt-get update
+      sudo apt-get install -y apt-transport-https ca-certificates gnupg
+      echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+      curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+      sudo apt-get update && sudo apt-get install -y google-cloud-cli
+    displayName: "Install Google Cloud SDK"
+
+  # -----------------------------
+  # Authenticate to GKE
+  # -----------------------------
+  - script: |
+      echo "$GCP_KEY" > key.json
+      gcloud auth activate-service-account --key-file key.json
+      gcloud config set project $(GCP_PROJECT)
+      gcloud container clusters get-credentials $(GKE_CLUSTER)
+    displayName: "Authenticate to GKE"
+
+  # -----------------------------
+  # Install Helm
+  # -----------------------------
+  - task: HelmInstaller@1
+    inputs:
+      helmVersion: "3.12.0"
+    displayName: "Install Helm"
+
+  # -----------------------------
+  # Deploy Helm chart to GKE
+  # -----------------------------
+  - script: |
+      helm upgrade --install iels-dev ./helm \
+        --namespace $(HELM_NAMESPACE) \
+        --create-namespace \
+        --set image.repository=docker.io/$(DOCKERHUB_USERNAME)/$(IMAGE_NAME) \
+        --set image.tag=$(IMAGE_TAG)
+    displayName: "Deploy Helm chart to GKE"
