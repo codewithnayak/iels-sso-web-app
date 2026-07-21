@@ -5,16 +5,16 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  group: GKE-Variables
-  NODE_VERSION: "20"
-  DOCKERHUB_USERNAME: "$(dockerhubUser)"
-  DOCKERHUB_PASSWORD: "$(dockerhubPass)"
-  IMAGE_NAME: "iels-sso-web-app"
-  IMAGE_TAG: "$(Build.BuildId)"
-  GCP_KEY: "$(gcpKey)" # Secret JSON key for GKE access
-  GCP_PROJECT: "iels-org"
-  GKE_CLUSTER: "autopilot-cluster-1"
-  HELM_NAMESPACE: "iels-dev"
+  - group: GKE-Variables
+    NODE_VERSION: "20"
+    DOCKERHUB_USERNAME: "$(dockerhubUser)"
+    DOCKERHUB_PASSWORD: "$(dockerhubPass)"
+    IMAGE_NAME: "iels-sso-web-app"
+    IMAGE_TAG: "$(Build.BuildId)"
+    GCP_KEY: "$(gcpKey)" # Secret JSON key for GKE access
+    GCP_PROJECT: "iels-org"
+    GKE_CLUSTER: "autopilot-cluster-1"
+    HELM_NAMESPACE: "iels-dev"
 
 steps:
   # -----------------------------
