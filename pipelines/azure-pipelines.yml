@@ -91,7 +91,7 @@ steps:
   # Authenticate to GKE
   # -----------------------------
   - script: |
-      echo "$GCP_KEY" > key.json
+      printf "%s" "$GCP_KEY" > key.json
       gcloud auth activate-service-account --key-file key.json
       gcloud config set project $(GCP_PROJECT)
       gcloud container clusters get-credentials $(GKE_CLUSTER)
