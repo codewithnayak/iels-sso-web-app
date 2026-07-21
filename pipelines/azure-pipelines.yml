@@ -75,6 +75,13 @@ steps:
       sudo apt-get update && sudo apt-get install -y google-cloud-cli
     displayName: "Install Google Cloud SDK"
 
+  # ⭐ Install GKE auth plugin (required for kubectl/helm)
+  - script: |
+      echo "Installing GKE auth plugin..."
+      sudo apt-get update
+      sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+    displayName: "Install GKE Auth Plugin"
+
   # Authenticate to GKE using Base64 key
   - script: |
       echo "Decoding GCP key..."
@@ -87,7 +94,9 @@ steps:
       gcloud config set project $(GCP_PROJECT)
 
       echo "Fetching GKE credentials..."
-      gcloud container clusters get-credentials $(GKE_CLUSTER)  --region europe-west12 --project $(GCP_PROJECT)
+      gcloud container clusters get-credentials $(GKE_CLUSTER) \
+      --region europe-west12 \
+      --project $(GCP_PROJECT)
     displayName: "Authenticate to GKE"
 
   # Install Helm
