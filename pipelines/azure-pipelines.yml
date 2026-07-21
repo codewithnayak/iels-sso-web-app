@@ -6,15 +6,33 @@ pool:
 
 variables:
   - group: GKE-Variables
-    NODE_VERSION: "20"
-    DOCKERHUB_USERNAME: "$(dockerhubUser)"
-    DOCKERHUB_PASSWORD: "$(dockerhubPass)"
-    IMAGE_NAME: "iels-sso-web-app"
-    IMAGE_TAG: "$(Build.BuildId)"
-    GCP_KEY: "$(gcpKey)" # Secret JSON key for GKE access
-    GCP_PROJECT: "iels-org"
-    GKE_CLUSTER: "autopilot-cluster-1"
-    HELM_NAMESPACE: "iels-dev"
+
+  - name: NODE_VERSION
+    value: "20"
+
+  - name: DOCKERHUB_USERNAME
+    value: "$(dockerhubUser)"
+
+  - name: DOCKERHUB_PASSWORD
+    value: "$(dockerhubPass)"
+
+  - name: IMAGE_NAME
+    value: "iels-sso-web-app"
+
+  - name: IMAGE_TAG
+    value: "$(Build.BuildId)"
+
+  - name: GCP_KEY
+    value: "$(gcpKey)"
+
+  - name: GCP_PROJECT
+    value: "iels-org"
+
+  - name: GKE_CLUSTER
+    value: "autopilot-cluster-1"
+
+  - name: HELM_NAMESPACE
+    value: "iels-dev"
 
 steps:
   # -----------------------------
