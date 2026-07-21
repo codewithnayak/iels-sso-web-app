@@ -14,24 +14,15 @@ COPY . .
 # Build the project (Next.js / React / Vite)
 RUN npm run build
 
-# ---- Production Stage ----
-FROM node:20-alpine
-
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
+FROM node:20-alpine AS build
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
 
-# Copy only necessary files from builder
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
 
-# Expose port (change if your app uses a different port)
-EXPOSE 3000
-
-# Switch to non-root user
-USER appuser
-
-# Start the app
-CMD ["npm", "start"]
