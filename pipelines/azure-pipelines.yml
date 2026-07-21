@@ -5,7 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - group: GKE-Variables
+  - group: GKE-Variables # contains gcpKeyBase64, dockerhubUser, dockerhubPass
 
   - name: NODE_VERSION
     value: "20"
@@ -22,8 +22,8 @@ variables:
   - name: IMAGE_TAG
     value: "$(Build.BuildId)"
 
-  - name: GCP_KEY
-    value: "$(gcpKey)"
+  - name: GCP_KEY_BASE64
+    value: "$(gcpKeyBase64)" # Base64 encoded JSON key
 
   - name: GCP_PROJECT
     value: "iels-org"
@@ -35,35 +35,25 @@ variables:
     value: "iels-dev"
 
 steps:
-  # -----------------------------
   # Install Node
-  # -----------------------------
   - task: NodeTool@0
     inputs:
       versionSpec: "$(NODE_VERSION)"
     displayName: "Install Node.js"
 
-  # -----------------------------
   # Install dependencies
-  # -----------------------------
   - script: npm ci
     displayName: "Install dependencies"
 
-  # -----------------------------
   # Build React app
-  # -----------------------------
   - script: npm run build
     displayName: "Build React app"
 
-  # -----------------------------
   # Install Docker
-  # -----------------------------
   - task: DockerInstaller@0
     displayName: "Install Docker"
 
-  # -----------------------------
   # Build + Push Docker image
-  # -----------------------------
   - script: |
       echo "Logging into Docker Hub..."
       echo "$(DOCKERHUB_PASSWORD)" | docker login -u "$(DOCKERHUB_USERNAME)" --password-stdin
@@ -75,9 +65,7 @@ steps:
       docker push $(DOCKERHUB_USERNAME)/$(IMAGE_NAME):$(IMAGE_TAG)
     displayName: "Build and push Docker image to Docker Hub"
 
-  # -----------------------------
   # Install gcloud CLI
-  # -----------------------------
   - script: |
       echo "Installing Google Cloud SDK..."
       sudo apt-get update
@@ -87,41 +75,28 @@ steps:
       sudo apt-get update && sudo apt-get install -y google-cloud-cli
     displayName: "Install Google Cloud SDK"
 
+  # Authenticate to GKE using Base64 key
   - script: |
-      echo "----- DEBUG: Raw GCP_KEY variable -----"
-      echo "$GCP_KEY"
+      echo "Decoding GCP key..."
+      echo "$GCP_KEY_BASE64" | base64 --decode > key.json
 
-      echo "----- DEBUG: Writing key.json using printf -----"
-      printf "%s" "$GCP_KEY" > key.json
+      echo "Authenticating..."
+      gcloud auth activate-service-account --key-file=key.json
 
-      echo "----- DEBUG: First 20 lines of key.json -----"
-      sed -n '1,20p' key.json
-
-      echo "----- DEBUG: File size -----"
-      wc -c key.json
-    displayName: "DEBUG: Inspect key.json"
-
-  # -----------------------------
-  # Authenticate to GKE
-  # -----------------------------
-  - script: |
-      printf "%s" "$GCP_KEY" > key.json
-      gcloud auth activate-service-account --key-file key.json
+      echo "Setting project..."
       gcloud config set project $(GCP_PROJECT)
-      gcloud container clusters get-credentials $(GKE_CLUSTER)
+
+      echo "Fetching GKE credentials..."
+      gcloud container clusters get-credentials $(GKE_CLUSTER) --zone europe-west2 --project $(GCP_PROJECT)
     displayName: "Authenticate to GKE"
 
-  # -----------------------------
   # Install Helm
-  # -----------------------------
   - task: HelmInstaller@1
     inputs:
       helmVersion: "3.12.0"
     displayName: "Install Helm"
 
-  # -----------------------------
   # Deploy Helm chart to GKE
-  # -----------------------------
   - script: |
       helm upgrade --install iels-dev ./helm \
         --namespace $(HELM_NAMESPACE) \
