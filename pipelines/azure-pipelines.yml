@@ -5,6 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
+  group: GKE-Variables
   NODE_VERSION: "20"
   DOCKERHUB_USERNAME: "$(dockerhubUser)"
   DOCKERHUB_PASSWORD: "$(dockerhubPass)"
