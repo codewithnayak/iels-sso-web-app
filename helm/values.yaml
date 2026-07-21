@@ -63,7 +63,7 @@ ingress:
   enabled: true
   host: "sso-cwa.ielsportal.com"
   managedCertificate: "els-sso-cert"
-  staticIpName: "els-sso-ip"   # optional
+  staticIpName: "iels-sso-ip"   # optional
   annotations: {}
 
 
