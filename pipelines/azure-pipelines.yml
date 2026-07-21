@@ -19,6 +19,9 @@ variables:
   - name: IMAGE_NAME
     value: "iels-sso-web-app"
 
+  - name: APP_NAME
+    value: "iels-sso-web-app"
+
   - name: IMAGE_TAG
     value: "$(Build.BuildId)"
 
@@ -107,7 +110,7 @@ steps:
 
   # Deploy Helm chart to GKE
   - script: |
-      helm upgrade --install iels-dev ./helm \
+      helm upgrade --install $APP_NAME ./helm \
         --namespace $(HELM_NAMESPACE) \
         --create-namespace \
         --set image.repository=docker.io/$(DOCKERHUB_USERNAME)/$(IMAGE_NAME) \
