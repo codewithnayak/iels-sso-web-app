@@ -87,6 +87,20 @@ steps:
       sudo apt-get update && sudo apt-get install -y google-cloud-cli
     displayName: "Install Google Cloud SDK"
 
+  - script: |
+      echo "----- DEBUG: Raw GCP_KEY variable -----"
+      echo "$GCP_KEY"
+
+      echo "----- DEBUG: Writing key.json using printf -----"
+      printf "%s" "$GCP_KEY" > key.json
+
+      echo "----- DEBUG: First 20 lines of key.json -----"
+      sed -n '1,20p' key.json
+
+      echo "----- DEBUG: File size -----"
+      wc -c key.json
+    displayName: "DEBUG: Inspect key.json"
+
   # -----------------------------
   # Authenticate to GKE
   # -----------------------------
