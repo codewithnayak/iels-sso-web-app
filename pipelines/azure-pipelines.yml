@@ -48,6 +48,22 @@ steps:
   - script: npm ci
     displayName: "Install dependencies"
 
+  - script: |
+      echo "Using environment: $(ENVIRONMENT)"
+
+      if [ "$(ENVIRONMENT)" = "production" ]; then
+        cp .env.production .env
+      elif [ "$(ENVIRONMENT)" = "staging" ]; then
+        cp .env.staging .env
+      elif [ "$(ENVIRONMENT)" = "dev" ]; then
+        cp .env.dev .env
+      else
+        cp .env.local .env
+      fi
+
+      echo "Environment file copied."
+    displayName: "Select environment file"
+
   # Build React app
   - script: npm run build
     displayName: "Build React app"

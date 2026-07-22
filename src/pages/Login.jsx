@@ -1,10 +1,26 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthCard from "../components/AuthCard.jsx";
+import { msalInstance } from "../services/identity/authConfig";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const redirectUri = import.meta.env.AZURE_REDIRECT_URI;
+  const handleLoginSSO = () => {
+    const params = new URLSearchParams(window.location.search);
+    const returnUrl = params.get("returnUrl") || redirectUri;
 
+    sessionStorage.setItem("returnUrl", returnUrl);
+
+    msalInstance.loginRedirect({
+      scopes: [
+        "openid",
+        "profile",
+        "email",
+        "api://442bbda6-535a-406d-818d-726ea77d53d0/.default",
+      ],
+    });
+  };
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
@@ -52,6 +68,18 @@ export default function Login() {
           </Link>
         </div>
       </form>
+
+      {/* DIVIDER */}
+      <div className="text-center my-4 text-sm text-gray-500 font-medium">
+        OR
+      </div>
+      <button
+        className="btn btn-primary w-100 mt-2"
+        type="submit"
+        onClick={handleLoginSSO}
+      >
+        Login with SSO
+      </button>
     </AuthCard>
   );
 }
