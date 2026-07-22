@@ -19,7 +19,8 @@ async function start() {
 
     const returnUrl = sessionStorage.getItem("returnUrl") || retrunUrl;
 
-    await identityClient.startSession(idToken, accessToken);
+    //enable it later once the identity manager service is written
+    //await identityClient.startSession(idToken, accessToken);
 
     sessionStorage.removeItem("returnUrl");
     window.location.href = returnUrl;
