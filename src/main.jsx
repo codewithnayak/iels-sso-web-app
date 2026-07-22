@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
 import { msalInstance } from "./services/identity/authConfig";
 import { identityClient } from "./services/identity/identityClient";
-const retrunUrl = import.meta.env.AZURE_RETURN_URL;
+const retrunUrl = import.meta.env.VITE_AZURE_RETURN_URL;
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 async function start() {

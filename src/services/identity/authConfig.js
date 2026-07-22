@@ -1,8 +1,8 @@
 import { PublicClientApplication } from "@azure/msal-browser";
 const redirectUri = import.meta.env.AZURE_REDIRECT_URI;
 
-console.log("AZURE_REDIRECT_URI =", import.meta.env.AZURE_REDIRECT_URI);
-console.log("AZURE_RETURN_URL =", import.meta.env.AZURE_RETURN_URL);
+console.log("AZURE_REDIRECT_URI =", import.meta.env.VITE_AZURE_REDIRECT_URI);
+console.log("AZURE_RETURN_URL =", import.meta.env.VITE_AZURE_RETURN_URL);
 export const msalInstance = new PublicClientApplication({
   auth: {
     clientId: "7fcaf705-a031-469e-b81d-2b4bac8f6cb2",
