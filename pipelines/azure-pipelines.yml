@@ -37,6 +37,9 @@ variables:
   - name: HELM_NAMESPACE
     value: "iels-dev"
 
+  - name: ENVIRONMENT
+    value: "dev"
+
 steps:
   # Install Node
   - task: NodeTool@0
@@ -56,7 +59,7 @@ steps:
       elif [ "$(ENVIRONMENT)" = "staging" ]; then
         cp .env.staging .env
       elif [ "$(ENVIRONMENT)" = "dev" ]; then
-        cp .env.dev .env
+        cp .env.development .env
       else
         cp .env.local .env
       fi
