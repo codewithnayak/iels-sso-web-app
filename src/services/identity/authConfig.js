@@ -1,5 +1,5 @@
 import { PublicClientApplication } from "@azure/msal-browser";
-const redirectUri = import.meta.env.AZURE_REDIRECT_URI;
+const redirectUri = import.meta.env.VITE_AZURE_REDIRECT_URI;
 
 console.log("AZURE_REDIRECT_URI =", import.meta.env.VITE_AZURE_REDIRECT_URI);
 console.log("AZURE_RETURN_URL =", import.meta.env.VITE_AZURE_RETURN_URL);
