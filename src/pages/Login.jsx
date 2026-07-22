@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthCard from "../components/AuthCard.jsx";
 import { msalInstance } from "../services/identity/authConfig";
-
+const url = import.meta.env.AZURE_RETURN_URL;
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
-  const redirectUri = import.meta.env.AZURE_REDIRECT_URI;
+
   const handleLoginSSO = () => {
     const params = new URLSearchParams(window.location.search);
-    const returnUrl = params.get("returnUrl") || redirectUri;
+    const returnUrl = params.get("returnUrl") || url;
 
     sessionStorage.setItem("returnUrl", returnUrl);
 

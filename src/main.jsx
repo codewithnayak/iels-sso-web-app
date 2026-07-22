@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
 import { msalInstance } from "./services/identity/authConfig";
 import { identityClient } from "./services/identity/identityClient";
-const redirectUri = import.meta.env.AZURE_REDIRECT_URI;
+const retrunUrl = import.meta.env.AZURE_RETURN_URL;
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 async function start() {
@@ -17,7 +17,7 @@ async function start() {
     const idToken = response.idToken;
     const accessToken = response.accessToken;
 
-    const returnUrl = sessionStorage.getItem("returnUrl") || redirectUri;
+    const returnUrl = sessionStorage.getItem("returnUrl") || retrunUrl;
 
     await identityClient.startSession(idToken, accessToken);
 
