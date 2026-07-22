@@ -22,7 +22,8 @@ async function start() {
     //enable it later once the identity manager service is written
     //await identityClient.startSession(idToken, accessToken);
 
-    sessionStorage.removeItem("returnUrl");
+    //sessionStorage.removeItem("returnUrl");
+    console.log(retrunUrl);
     window.location.href = returnUrl;
     return;
   }
